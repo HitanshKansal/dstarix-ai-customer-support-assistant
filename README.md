@@ -95,6 +95,23 @@ Open the local URL shown in the terminal, usually:
 http://localhost:8501
 ```
 
+## Render Deployment
+
+This repository includes `render.yaml` for Render Blueprint deployment.
+
+On Render:
+
+1. Create a new Blueprint or Web Service from this GitHub repository.
+2. Use the `main` branch.
+3. When Render asks for environment variables, add your real Groq API key for `GROQ_API_KEY`.
+4. Keep `GROQ_MODEL` as `openai/gpt-oss-20b` unless you want to use another supported Groq chat model.
+
+Render uses this start command from `render.yaml`:
+
+```bash
+streamlit run app.py --server.address 0.0.0.0 --server.port $PORT --server.headless true
+```
+
 Example questions:
 
 - What services does DStarix Techno provide?
@@ -117,6 +134,7 @@ For careers questions, the assistant should direct users to official sources:
 |-- knowledge.py
 |-- prompts.py
 |-- requirements.txt
+|-- render.yaml
 |-- README.md
 |-- .env.example
 |-- .gitignore
