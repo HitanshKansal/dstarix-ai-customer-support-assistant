@@ -8,6 +8,8 @@ DStarix Techno AI Customer Support Assistant
 
 This project is a Streamlit-based AI customer support chatbot for DStarix Techno. It uses Python, LangChain, and Groq to answer customer questions in a professional and context-aware way.
 
+Live app: https://dstarix-ai-customer-support-assistant.onrender.com
+
 The assistant uses a static verified knowledge base from `knowledge.py`. It does not scrape LinkedIn, does not browse live job posts at runtime, and does not invent current openings.
 
 ## Features
@@ -98,6 +100,12 @@ http://localhost:8501
 ## Render Deployment
 
 This repository includes `render.yaml` for Render Blueprint deployment.
+
+Live Render deployment:
+
+```text
+https://dstarix-ai-customer-support-assistant.onrender.com
+```
 
 On Render:
 
