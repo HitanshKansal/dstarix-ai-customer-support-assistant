@@ -7,7 +7,6 @@ import os
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
-from urllib.parse import quote
 
 import streamlit as st
 from dotenv import load_dotenv
@@ -464,6 +463,46 @@ def apply_customer_ui_styles() -> None:
                 color: #b91c1c !important;
             }
 
+            [data-testid="stSidebar"] [class*="st-key-chat_row_"] {
+                margin: 0.22rem 0;
+            }
+
+            [data-testid="stSidebar"] [class*="st-key-chat_row_"] div.stButton:first-of-type {
+                flex: 1 1 auto;
+                min-width: 0;
+            }
+
+            [data-testid="stSidebar"] [class*="st-key-delete_chat_"] {
+                opacity: 0;
+                flex: 0 0 auto;
+                transition: opacity 160ms ease;
+            }
+
+            [data-testid="stSidebar"] [class*="st-key-chat_row_"]:hover [class*="st-key-delete_chat_"],
+            [data-testid="stSidebar"] [class*="st-key-delete_chat_"]:focus-within {
+                opacity: 1;
+            }
+
+            [data-testid="stSidebar"] [class*="st-key-delete_chat_"] button {
+                align-items: center !important;
+                justify-content: center !important;
+                width: 1.9rem !important;
+                min-width: 1.9rem !important;
+                height: 1.9rem !important;
+                min-height: 1.9rem !important;
+                padding: 0 !important;
+                border-radius: 7px !important;
+            }
+
+            [data-testid="stSidebar"] [class*="st-key-delete_chat_"] button:hover {
+                background: #fee2e2 !important;
+                color: #b91c1c !important;
+            }
+
+            [data-testid="stSidebar"] [class*="st-key-delete_chat_"] button p {
+                display: none;
+            }
+
             @media (min-width: 701px) {
                 [data-testid="stSidebarHeader"],
                 [data-testid="stSidebarCollapseButton"],
@@ -504,6 +543,10 @@ def apply_customer_ui_styles() -> None:
                 }
 
                 .sidebar-chat-delete {
+                    opacity: 0.78;
+                }
+
+                [data-testid="stSidebar"] [class*="st-key-delete_chat_"] {
                     opacity: 0.78;
                 }
 
@@ -713,50 +756,35 @@ def get_sorted_chat_sessions() -> list[tuple[str, dict]]:
     )
 
 
-def get_query_param(name: str) -> str:
-    """Read one query parameter value from Streamlit's query params."""
-    value = st.query_params.get(name, "")
-    if isinstance(value, list):
-        return value[0] if value else ""
-    return value
-
-
-def handle_sidebar_query_actions() -> None:
-    """Handle saved-chat links rendered in the custom sidebar rows."""
-    delete_chat_id = get_query_param("delete_chat_id")
-    if delete_chat_id:
-        delete_chat_session(delete_chat_id)
-        st.query_params.clear()
-        st.rerun()
-
-    chat_id = get_query_param("chat_id")
-    if chat_id:
-        load_chat_session(chat_id)
-        st.query_params.clear()
-        st.rerun()
-
-
 def render_saved_chat_row(chat_id: str, title: str, is_active: bool) -> None:
-    """Render a responsive saved-chat row with a small delete icon."""
-    safe_title = html.escape(title)
-    safe_title_attr = html.escape(title, quote=True)
-    safe_chat_id = quote(chat_id, safe="")
-    active_class = " active" if is_active else ""
+    """Render a responsive saved-chat row without browser navigation."""
+    button_type = "primary" if is_active else "secondary"
 
-    st.markdown(
-        f"""
-        <div class="sidebar-chat-row{active_class}">
-            <a class="sidebar-chat-link" href="?chat_id={safe_chat_id}" title="{safe_title_attr}">
-                <span class="sidebar-chat-icon">history</span>
-                <span class="sidebar-chat-title">{safe_title}</span>
-            </a>
-            <a class="sidebar-chat-delete" href="?delete_chat_id={safe_chat_id}" title="Delete chat" aria-label="Delete chat">
-                <span class="material-symbols-rounded">delete</span>
-            </a>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+    with st.container(
+        horizontal=True,
+        vertical_alignment="center",
+        gap="xxsmall",
+        key=f"chat_row_{chat_id}",
+    ):
+        st.button(
+            title,
+            key=f"saved_chat_{chat_id}",
+            icon=":material/history:",
+            type=button_type,
+            width="stretch",
+            on_click=load_chat_session,
+            args=(chat_id,),
+        )
+        st.button(
+            "Delete chat",
+            key=f"delete_chat_{chat_id}",
+            icon=":material/delete:",
+            help=f"Delete chat: {title}",
+            type="tertiary",
+            width=34,
+            on_click=delete_chat_session,
+            args=(chat_id,),
+        )
 
 
 def format_chat_history(messages: list[dict[str, str]]) -> str:
@@ -943,7 +971,6 @@ def main() -> None:
     api_key_configured = bool(api_key)
 
     initialize_chat()
-    handle_sidebar_query_actions()
     render_sidebar()
     show_header()
     render_chat_history()
