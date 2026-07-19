@@ -1,0 +1,28 @@
+# Environment variables and secrets
+.env
+chat_sessions.json
+
+# Python virtual environment
+venv/
+
+# Python cache files
+__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Build and packaging artifacts
+build/
+dist/
+*.egg-info/
+
+# Tooling and OS files
+.pytest_cache/
+.streamlit/secrets.toml
+.git.invalid-backup/
+.git-data/
+.agents/
+.claude/
+.DS_Store
+Thumbs.db
